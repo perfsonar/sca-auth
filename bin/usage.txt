@@ -28,6 +28,11 @@ pwa_auth modscope --username hayashis [or --id 123] --set '{"common": ["user", "
 pwa_auth modscope --username hayashis [or --id 123] --add '{"common": ["user", "admin"]}'
 pwa_auth modscope --username hayashis [or --id 123] --del '{"common": ["user", "admin"]}'
 
+* Modify (set/add/del) user scopes, but only within a given context (--context flag)
+pwa_auth modscope --username hayashis [or --id 123] --set '["user", "admin"]' --context pwa
+pwa_auth modscope --username hayashis --add '["admin"]' --context pwa
+pwa_auth modscope --username hayashis --del '["admin"]' --context pwa
+
 * remove user
 pwa_auth userdel --username hayashis [or --id 123]
 
