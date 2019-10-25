@@ -116,7 +116,6 @@ function listuser() {
         }
 
         function add(base, sub, scope) {
-            console.log("in ADD: base, sub, scope\n", base,"\n", sub,"\n", scope);
             if(sub.constructor == Array) {
                 sub.forEach(function(item) {
                     if ( ! ( scope in base ) ) {
@@ -139,7 +138,6 @@ function listuser() {
         }
 
         function del(base, sub, scope) {
-            console.log("in DEL: base, sub, scope\n", base,"\n", sub,"\n", scope);
             if(typeof sub == 'object' && sub.constructor == Array) {
                 sub.forEach(function(item) {
                     var pos = base[scope].indexOf(item);
@@ -227,11 +225,8 @@ function listuser() {
         }
 
         function del(base, sub) {
-            //console.log("DEL base, sub\n", base,"\n", sub);
             if(typeof sub == 'object' && sub.constructor == Array) {
-                //console.log("sub is array");
                 sub.forEach(function(item) {
-                    //console.log("item", item);
                     delete base[item];
                     /*
                     var pos = base.indexOf(item);
@@ -239,29 +234,9 @@ function listuser() {
                     */
                 });
             } else if(typeof sub == 'object') {
-                //console.log("sub is object");
                 Object.keys(sub).forEach(function( k, index, self) {
-                    /*
-                    console.log("self", self);
-                    console.log("base", base);
-                    console.log("sub", sub);
-                    console.log("k", k);
-                    console.log("k, base[k]", k, base[k]);
-                    */
                     delete base[k];
                     delete sub[k];
-                    //del(base[k], sub[k]);
-                    /*
-                    if(base[k] !== undefined) { 
-                        delete base[k];
-                        delete sub[k];
-                    }
-                    */
-               /* if ( base[k].length == 0 ) {
-                    delete base[k];
-
-                }
-                */
                 });
             }
             return base;
@@ -283,7 +258,6 @@ function listuser() {
             if(argv.del) {
                 user.scopes = del(_.clone(user.scopes), JSON.parse(argv.del));
             }
-            //console.log("user.scopes at end", user.scopes);
             user.save().then(function() {
                 logger.info("successfully updated user scope. user must re-login for it to take effect)");
                 process.exit();
@@ -376,7 +350,6 @@ function listuser() {
             if(!user) return logger.error("can't find user:"+argv.id);
             if ( user.username == argv.username || argv.username == null ) delete uniqueFieldChecks.username;
             if ( user.email == argv.email || argv.email == null ) delete uniqueFieldChecks.email;
-            //console.log("uniqueFieldChecks", uniqueFieldChecks);
             db.User.findOne({where: { 
                 $or: [
                 uniqueFieldChecks
