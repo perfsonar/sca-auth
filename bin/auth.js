@@ -35,8 +35,23 @@ switch(argv._[0]) {
 }
 
 function listuser() {
-    db.User.findAll({/*attributes: ['id', 'username', 'email', 'active', 'scopes', 'times', 'createdAt'],*/ raw: true})
-    .then(function(users) {
+    if ( argv.id || argv.username || argv.email ) {
+	var condition = 
+	    {where: {
+		$or: [
+		    {id: argv.id},
+		    {username: argv.username},
+		    {email: argv.email},
+		]},raw: true}
+    } else {
+	condition = {raw: true}
+    }
+
+    db.User.findAll(condition)
+        .then(function(users) {
+            if ( users.length < 1) {
+                console.error("No users found");
+            }
             var compact = argv.compact;
             if ( ! argv.short ) {
                 if ( !compact ) {
