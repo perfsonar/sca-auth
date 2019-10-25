@@ -23,6 +23,7 @@ const shortListCols = [ "id", "active", "username", "email", "fullname" ];
 
 switch(argv._[0]) {
     case "modscope": modscope(); break;
+    case "modrole": modrole(); break;
     case "listuser": listuser(); break;
     case "issue": issue(); break;
     case "setpass": setpass(); break;
@@ -108,10 +109,107 @@ function listuser() {
         */
     }
 
+    function modrole() {
+        if(!argv.username && !argv.id) {
+            logger.error("please specify --username <username> (or --id <userid>) --set/add/del '[\"user\",\"admin\"]'");
+            process.exit(1);
+        }
+
+        function add(base, sub, scope) {
+            console.log("in ADD: base, sub, scope\n", base,"\n", sub,"\n", scope);
+            if(sub.constructor == Array) {
+                sub.forEach(function(item) {
+                    if ( ! ( scope in base ) ) {
+                        base[scope] = [ item ];
+                    } else {
+                        if(!~base[scope].indexOf(item)) { 
+                            base[scope].push(item);
+                            //base[scope] = item;
+                        }
+
+                    }
+                });
+            } else {
+                for(var k in sub) {
+                    if(base[k] === undefined) base[k] = sub[k];
+                    else add(base[k], sub[k]);
+                }
+            }
+            return base;
+        }
+
+        function del(base, sub, scope) {
+            console.log("in DEL: base, sub, scope\n", base,"\n", sub,"\n", scope);
+            if(typeof sub == 'object' && sub.constructor == Array) {
+                sub.forEach(function(item) {
+                    var pos = base[scope].indexOf(item);
+                    if(~pos) base[scope].splice(pos, 1);
+                });
+            } else if(typeof sub == 'object') {
+                for(var k in sub) {
+                    if(base[k] !== undefined) del(base[k], sub[k]);
+                }
+            }
+            if ( base[scope].length == 0 ) {
+                delete base[scope];
+
+            }
+            return base;
+        }
+
+        db.User.findOne({where: { 
+            $or: [
+                {username: argv.username}, 
+                {id: argv.id}, 
+            ]} 
+        }).then(function(user) {
+            if(!user) return logger.error("can't find user:"+argv.username);
+            if ( !( argv.set || argv.add || argv.del ) ) {
+                logger.error("No action specified to modify ");
+                process.exit(1);
+            }
+            if(argv.set) {
+                user.scopes = JSON.parse(argv.set);
+            }
+            var scope = argv.scope;
+            if ( typeof scope == "undefined" || scope === true ) {
+                logger.error("no scope specified");
+                process.exit(1);
+
+            }
+
+            if(argv.add) {
+                user.scopes = add(_.clone(user.scopes), JSON.parse(argv.add), scope);
+            }
+            if(argv.del) {
+                if ( ! ( scope in user.scopes ) ) {
+                    logger.info("Scope not exist; cannot delete roles within it");
+                    process.exit(1);
+                }
+                user.scopes = del(_.clone(user.scopes), JSON.parse(argv.del), scope);
+            }
+            user.save().then(function() {
+                logger.info("successfully updated user role. user must re-login for it to take effect)");
+                logger.info("Updated scopes: ", JSON.stringify(user.scopes));
+            }).catch(function(err) {
+                logger.error(err);
+            });
+        })
+    }
+
     function modscope() {
         if(!argv.username && !argv.id) {
             logger.error("please specify --username <username> (or --id <userid>) --set/add/del '{{common: [\"user\", \"admin\"]}}'");
             process.exit(1);
+        }
+        if ( !( argv.set || argv.add || argv.del ) ) {
+            logger.error("No action specified to modify scope");
+            process.exit(1);
+        }
+        if ( argv.scope ) {
+            logger.error("Invalid parameter --scope. Did you mean to run 'modrole'?");
+            process.exit(1);
+
         }
 
         function add(base, sub) {
@@ -129,15 +227,42 @@ function listuser() {
         }
 
         function del(base, sub) {
+            //console.log("DEL base, sub\n", base,"\n", sub);
             if(typeof sub == 'object' && sub.constructor == Array) {
+                //console.log("sub is array");
                 sub.forEach(function(item) {
+                    //console.log("item", item);
+                    delete base[item];
+                    /*
                     var pos = base.indexOf(item);
                     if(~pos) base.splice(pos, 1);
+                    */
                 });
             } else if(typeof sub == 'object') {
-                for(var k in sub) {
-                    if(base[k] !== undefined) del(base[k], sub[k]);
+                //console.log("sub is object");
+                Object.keys(sub).forEach(function( k, index, self) {
+                    /*
+                    console.log("self", self);
+                    console.log("base", base);
+                    console.log("sub", sub);
+                    console.log("k", k);
+                    console.log("k, base[k]", k, base[k]);
+                    */
+                    delete base[k];
+                    delete sub[k];
+                    //del(base[k], sub[k]);
+                    /*
+                    if(base[k] !== undefined) { 
+                        delete base[k];
+                        delete sub[k];
+                    }
+                    */
+               /* if ( base[k].length == 0 ) {
+                    delete base[k];
+
                 }
+                */
+                });
             }
             return base;
         }
@@ -158,10 +283,13 @@ function listuser() {
             if(argv.del) {
                 user.scopes = del(_.clone(user.scopes), JSON.parse(argv.del));
             }
+            //console.log("user.scopes at end", user.scopes);
             user.save().then(function() {
                 logger.info("successfully updated user scope. user must re-login for it to take effect)");
+                process.exit();
             }).catch(function(err) {
                 logger.error(err);
+                process.exit(1);
             });
         })
     }
