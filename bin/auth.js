@@ -136,7 +136,7 @@ function listuser() {
                     if ( ! ( scope in base ) ) {
                         base[scope] = [ item ];
                     } else {
-                        if(!~base[scope].indexOf(item)) { 
+                        if(!~base[scope].indexOf(item)) {
                             base[scope].push(item);
                             //base[scope] = item;
                         }
@@ -170,21 +170,21 @@ function listuser() {
             return base;
         }
 
-        db.User.findOne({where: { 
+        db.User.findOne({where: {
             $or: [
-                {username: argv.username}, 
-                {id: argv.id}, 
-            ]} 
+                {username: argv.username},
+                {id: argv.id},
+            ]}
         }).then(function(user) {
             if(!user) return logger.error("can't find user:"+argv.username);
             if ( !( argv.set || argv.add || argv.del ) ) {
-                logger.error("No action specified to modify ");
+                logger.error("No action specified to modify role ");
                 process.exit(1);
             }
-            if(argv.set) {
-                user.scopes = JSON.parse(argv.set);
-            }
             var scope = argv.scope;
+            if(argv.set) {
+                user.scopes[ scope ] = JSON.parse(argv.set);
+            }
             if ( typeof scope == "undefined" || scope === true ) {
                 logger.error("no scope specified");
                 process.exit(1);
