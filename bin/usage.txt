@@ -24,9 +24,15 @@ pwa_auth issue --scopes '{"sca": ["user","admin"]}' --profile '{"fullname": "Soi
 pwa_auth setpass --username hayashis [or --id 123] --password "password#123"
 
 * Modify (set/add/del) user scopes
-pwa_auth modscope --username hayashis [or --id 123] --set '{"common": ["user", "admin"]}'
-pwa_auth modscope --username hayashis [or --id 123] --add '{"common": ["user", "admin"]}'
-pwa_auth modscope --username hayashis [or --id 123] --del '{"common": ["user", "admin"]}'
+pwa_auth modscope --username hayashis [or --id 123] --set '{"common": ["user","admin"]}'
+pwa_auth modscope --username hayashis [or --id 123] --add '{"common": ["user","admin"]}'
+pwa_auth modscope --username hayashis [or --id 123] --del '{"common": ["user","admin"]}'
+
+* Modify (set/add/del) user roles within a given scope (--scope flag)
+  - Syntax note: format is JSON array, i.e.: --set '["user","admin"]'
+pwa_auth modrole --username hayashis [or --id 123] --setrole '["user","admin"]' --scope pwa
+pwa_auth modrole --username hayashis --addrole '["admin"]' --scope pwa
+pwa_auth modrole --username hayashis --delrole '["admin"]' --scope pwa
 
 * remove user
 pwa_auth userdel --username hayashis [or --id 123]
