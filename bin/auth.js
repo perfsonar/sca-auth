@@ -14,6 +14,7 @@ var winston = require('winston');
 var jwt = require('jsonwebtoken');
 var fs = require('fs');
 var _ = require('underscore');
+const readlineSync = require('readline-sync');
 
 var logger = new winston.Logger(config.logger.winston);
 var db = require('../api/models');
@@ -21,25 +22,30 @@ var db = require('../api/models');
 const shortListCols = [ "id", "active", "username", "email", "fullname" ];
 
 switch(argv._[0]) {
-case "modscope": modscope(); break;
-case "listuser": listuser(); break;
-case "issue": issue(); break;
-case "setpass": setpass(); break;
-case "useradd": useradd(); break;
-case "userdel": userdel(); break;
-default:
-    console.log(fs.readFileSync(__dirname+"/usage.txt", {encoding: "utf8"})); 
+    case "modscope": modscope(); break;
+    case "listuser": listuser(); break;
+    case "issue": issue(); break;
+    case "setpass": setpass(); break;
+    case "useradd": useradd(); break;
+    case "usermod": usermod(); break;
+    case "userdel": userdel(); break;
+    default:
+        console.log(fs.readFileSync(__dirname+"/usage.txt", {encoding: "utf8"})); 
+        break;
 }
 
 function listuser() {
     db.User.findAll({/*attributes: ['id', 'username', 'email', 'active', 'scopes', 'times', 'createdAt'],*/ raw: true})
     .then(function(users) {
-            //console.dir(users);
+            var compact = argv.compact;
             if ( ! argv.short ) {
-                console.dir(users);
+                if ( !compact ) {
+                    console.log( JSON.stringify( users, null, "   " ) );
+                } else {
+                    console.log( JSON.stringify( users ) );
+                }
             } else {
                 console.log( shortListCols.join("\t") );
-                //console.log(columns);
                 _.map(users, function(user) {
                     var row = [];
                     _.each( shortListCols, function(col) {
@@ -53,7 +59,8 @@ function listuser() {
 
     function issue() {
         if(!argv.scopes || argv.sub === undefined) {
-            logger.error("./auth.js issue --scopes '{common: [\"user\"]}' --sub 'my_service' [--exp 1514764800]  [--out token.jwt] [--key test.key]");
+
+            logger.error("pwa_auth issue --scopes '{common: [\"user\"]}' --sub 'my_service' [--exp 1514764800]  [--out token.jwt] [--key test.key]");
             process.exit(1);
         }
 
@@ -164,10 +171,6 @@ function listuser() {
             logger.error("please specify --username <username> or --id <userid>");
             process.exit(1);
         }
-        if(!argv.password) {
-            logger.error("please specify --password <password>");
-            process.exit(1);
-        }
 
         db.User.findOne({where: {
             $or: [
@@ -176,7 +179,34 @@ function listuser() {
             ]}
         }).then(function(user) {
             if(!user) return logger.error("can't find user:"+argv.username);
-            user.setPassword(argv.password, function(err) {
+            var newPassword = argv.password;
+            if ( typeof newPassword == "undefined" ) {
+                // 'true' indicates we should prompt user for password
+                newPassword = true;
+            }
+            if ( newPassword === true ) {
+                var confirmPassword;
+                while (confirmPassword != newPassword ) {
+                    newPassword = readlineSync.question('Please enter new password: ', {
+                        hideEchoBack: true // The typed text on screen is hidden by `*` (default).
+                    });
+                    confirmPassword = readlineSync.question('Please confirm new password: ', {
+                        hideEchoBack: true // The typed text on screen is hidden by `*` (default).
+                    });
+                    if ( newPassword != confirmPassword ) {
+                        console.log("passwords don't match; try again");
+                    }
+                }
+                if ( newPassword == confirmPassword && newPassword != "" ) {
+                    console.log("updating password");
+                } else {
+                    return logger.error("error updating password for user "+user.username + "; password must not be empty.");
+
+                }
+
+            }
+
+            user.setPassword(newPassword, function(err) {
                 if(err) throw err;
                 user.save().then(function() {
                     logger.log("successfully updated password");
@@ -185,6 +215,72 @@ function listuser() {
                 });
             });
         })
+    }
+
+    function usermod() {
+        var updateFields = {};
+        if(!argv.id) {
+            logger.error("You must specify a user id to modify, like this: --id <userid>");
+            process.exit(1);
+        }
+
+        if(argv.username && argv.username !== true) {
+            logger.info("New username specified: " + argv.username);
+            updateFields.username = argv.username;
+        }
+        if(argv.email && argv.email !== true) {
+            logger.info("New email specified: " + argv.email);
+            updateFields.email = argv.email;
+        }
+        if(argv.fullname && argv.fullname !== true) {
+            logger.info("New fullname specified: " + argv.fullname);
+            updateFields.fullname = argv.fullname;
+        }
+        var uniqueFieldChecks = {
+            username: argv.username,
+            email: argv.email
+        };
+        var userExists = false;
+        // make sure the user exists
+        db.User.findOne({where: 
+            {id: argv.id}
+        }).then(function(user) {
+            if(!user) return logger.error("can't find user:"+argv.id);
+            if ( user.username == argv.username || argv.username == null ) delete uniqueFieldChecks.username;
+            if ( user.email == argv.email || argv.email == null ) delete uniqueFieldChecks.email;
+            //console.log("uniqueFieldChecks", uniqueFieldChecks);
+            db.User.findOne({where: { 
+                $or: [
+                uniqueFieldChecks
+                ]} 
+            }).then(function(user) {
+                //console.log("prevent duplicate user");
+                if ( user ) userExists = true;
+
+                if ( userExists ) {
+                    logger.error("Error: not updating user; username and email must be unique");
+                    process.exit(1);
+                }
+
+                // make sure the user exists
+                db.User.findOne({where: 
+                    {id: argv.id}
+                }).then(function(user) {
+                    if(!user) return logger.error("can't find user:"+argv.id);
+                    var newPassword = argv.password;
+                });
+
+                // update the values
+                db.User.update(
+                    updateFields,
+                    {where: {id: argv.id}
+                    }).then(function(user) {
+                        console.log("Updated user ");
+                    });
+
+            });
+        });
+
     }
 
     function useradd() {
@@ -214,7 +310,7 @@ function listuser() {
             if ( user ) userExists = true;
 
             if ( userExists ) {
-                logger.error("username and email must be unique");
+                logger.error("User already exists; username and email must be unique");
                 process.exit(1);
             }
 

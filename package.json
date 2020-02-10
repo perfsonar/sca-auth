@@ -33,6 +33,7 @@
     "passport-local": "~1.0.0",
     "passport-oauth2": "^1.4.0",
     "promise": "^7.0.4",
+    "readline-sync": "^1.4.10",
     "request": "^2.81.0",
     "sequelize": "^3.30.4",
     "sequelize-json": "^2.1.2",
