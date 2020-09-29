@@ -95,6 +95,16 @@ exports.oidc = {
 };
 */
 
+exports.github = {
+    //set to true if you want to auto register user account when user first login using this account
+    auto_register: true,
+
+    client_id: "",
+    client_secret: "",
+    callback_url: "https://hostname/pwa/api/auth/github/callback",
+};
+
+
 //for x509
 exports.x509 = {
     //http header to look for x509 DN 

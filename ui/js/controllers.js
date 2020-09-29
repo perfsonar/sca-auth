@@ -53,7 +53,9 @@ function($scope, $route, toaster, $http, $routeParams, $location, scaMessage, $s
     }
 
     $scope.begin = function(type) {
-        window.location = "/api/auth/"+type+"/signin"; 
+        //console.log("$scope.appconf", $scope.appconf);
+        var api_prefix = $scope.appconf.api || "/pwa/";
+        window.location = api_prefix +"/"+ type+"/signin"; 
     }
 
     $scope.begin_x509 = function() {

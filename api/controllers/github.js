@@ -7,7 +7,7 @@ const winston = require('winston');
 const jwt = require('express-jwt');
 const clone = require('clone');
 const passport = require('passport');
-const GitHubStrategy = require('passport-github').Strategy;
+const GitHubStrategy = require('passport-github2').Strategy;
 
 //mine
 const config = require('../config');
@@ -15,6 +15,9 @@ const logger = new winston.Logger(config.logger.winston);
 
 const common = require('../common');
 const db = require('../models');
+
+console.log("github common", common);
+console.log("github config", config);
 
 passport.use(new GitHubStrategy({
     clientID: config.github.client_id,
@@ -38,11 +41,11 @@ router.get('/callback', jwt({
     },
 }), function(req, res, next) {
     console.log("github signin /callback called ");
-    passport.authenticate('github', /*{failureRedirect: '/auth/error'},*/ function(err, user, profile) {
+    passport.authenticate('github', /*{failureRedirect: '/pwa/auth/error'},*/ function(err, user, profile) {
         logger.debug("github callback", JSON.stringify(profile, null, 4));
         if(err) {
             console.error(err);
-            return res.redirect('/auth/#!/signin?msg='+"Failed to authenticate");
+            return res.redirect('/pwa/auth/#!/signin?msg='+"Failed to authenticate");
         }
         if(req.user) {
             //association
@@ -53,7 +56,7 @@ router.get('/callback', jwt({
                     message: "Your github account is already associated to another account. Please signoff / login with your github account."
                 }];
                 res.cookie('messages', JSON.stringify(messages), {path: '/'});
-                res.redirect('/auth/#!/settings/account');
+                res.redirect('/pwa/auth/#!/settings/account');
             } else {
                 db.User.findOne({where: {id: req.user.sub}}).then(function(user) {
                     if(!user) throw new Error("couldn't find user record with SCA sub:"+req.user.sub);
@@ -64,7 +67,7 @@ router.get('/callback', jwt({
                             message: "Successfully associated your github account"
                         }];
                         res.cookie('messages', JSON.stringify(messages), {path: '/'});
-                        res.redirect('/auth/#!/settings/account');
+                        res.redirect('/pwa/auth/#!/settings/account');
                     });
                 });
             }
@@ -73,12 +76,12 @@ router.get('/callback', jwt({
                 if(config.github.auto_register) {
                     register_newuser(profile, res, next);
                 } else {
-                    res.redirect('/auth/#!/signin?msg='+"Your github account is not yet registered. Please login using your username/password first, then associate your github account inside account settings.");
+                    res.redirect('/pwa/auth/#!/signin?msg='+"Your github account is not yet registered. Please login using your username/password first, then associate your github account inside account settings.");
                 }
             } else {
                 issue_jwt(user, profile, function(err, jwt) {
                     if(err) return next(err);
-                    res.redirect('/auth/#!/success/'+jwt);
+                    res.redirect('/pwa/auth/#!/success/'+jwt);
                 });
             }
         }
@@ -101,8 +104,8 @@ function register_newuser(profile, res, next) {
             issue_jwt(user, profile, function(err, jwt) {
                 if(err) return next(err);
                 logger.info("registration success", jwt);
-                res.redirect('/auth/#!/signup/'+jwt);
-                //res.redirect('/auth/#!/success/'+jwt);
+                res.redirect('/pwa/auth/#!/signup/'+jwt);
+                //res.redirect('/pwa/auth/#!/success/'+jwt);
             });
         });
     });
