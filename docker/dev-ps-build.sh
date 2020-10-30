@@ -1,4 +1,4 @@
-VER=4.2.3
+VER=4.3.0-beta.1
 
 docker build -t perfsonar/sca-auth:$VER ..
 if [ ! $? -eq 0 ]; then
