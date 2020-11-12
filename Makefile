@@ -26,8 +26,8 @@ manifest:
 
 npm:
 	#cd ui; npm install --production
-	npm install --only=prod
-	pushd ui; npm install --only=prod; popd
+	npm install --only=prod && \
+	pushd ui && npm install --only=prod && popd
 
 webpack:
 	./ui/node_modules/webpack/bin/webpack.js ui/js/app.js -o ui/dist/pwa-admin-ui-bundle.js
