@@ -1,4 +1,4 @@
-FROM node:6
+FROM node:8
 
 MAINTAINER Michael Johnson <mj82@globalnoc.iu.edu>
 
