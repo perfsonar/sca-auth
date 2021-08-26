@@ -1,29 +1,29 @@
 language: node_js
 
 compiler:
-  - clang
-  - gcc
+    - clang
+    - gcc
 
 node_js:
-  - 6
+    - 6
 
 install:
-  - npm install
-  - if [ "$CXX" = "g++" ]; then export CXX="g++-4.8" CC="gcc-4.8"; fi
+    - npm install
+    - if [ "$CXX" = "g++" ]; then export CXX="g++-4.8" CC="gcc-4.8"; fi
 addons:
-  apt:
-    sources:
-    - ubuntu-toolchain-r-test
-    packages:
-    - gcc-4.8
-    - g++-4.8
-    - clang
+    apt:
+        sources:
+            - ubuntu-toolchain-r-test
+        packages:
+            - gcc-4.8
+            - g++-4.8
+            - clang
 
 script:
-  - ./test/install.sh && npm run cover
+    - ./test/install.sh && npm run cover
 
 # Send coverage data to Coveralls
 after_script: "cat coverage/lcov.info | node_modules/coveralls/bin/coveralls.js"
 
 notifications:
-  slack: research-technologies:izdZdry8NEjrDmTjbHL5dCA8
+    slack: research-technologies:izdZdry8NEjrDmTjbHL5dCA8

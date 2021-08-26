@@ -1,4 +1,4 @@
-'use strict';
+"use strict";
 
 /*
 function handle_auth_issues(res) {

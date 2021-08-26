@@ -35,6 +35,7 @@ cd /etc/sca-auth
 wget https://raw.githubusercontent.com/soichih/sca-auth/master/api/config/index.js.sample
 cp index.js.sample index.js
 ```
+
 And edit index.js. You need to point various paths to the right place. Just contact me if you aren't sure.
 
 You also need to create public / prviate keys (see above for `openssl genrsa`)
