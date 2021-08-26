@@ -43,9 +43,12 @@
     "devDependencies": {
         "chai": "^3.5.0",
         "coveralls": "^2.13.1",
+        "eslint": "^7.32.0",
+        "eslint-config-prettier": "^8.3.0",
         "istanbul": "^0.4.3",
         "mocha": "^3.4.1",
         "nyc": "^15.1.0",
+        "prettier": "2.3.2",
         "supertest": "^3.0.0"
     }
 }
