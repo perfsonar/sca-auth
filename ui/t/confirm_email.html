@@ -1,13 +1,18 @@
 <div class="container">
     <div id="page-wrapper">
         <h1 class="page-header">Email Confirmation</h1>
-        <p>Please check your email inbox and follow the instruction found in the email.</p>
-        <br>
+        <p>
+            Please check your email inbox and follow the instruction found in
+            the email.
+        </p>
+        <br />
         <p ng-if="sub">
             Or ...
-            <button type="button" class="btn btn-sm" ng-click="resend()">Resend Confirmation Email</button>
+            <button type="button" class="btn btn-sm" ng-click="resend()">
+                Resend Confirmation Email
+            </button>
         </p>
     </div>
-    <ng-include src="'t/footer.html'"></ng-include> <!--should this be part of view?-->
+    <ng-include src="'t/footer.html'"></ng-include>
+    <!--should this be part of view?-->
 </div>
-

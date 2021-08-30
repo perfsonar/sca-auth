@@ -4,20 +4,34 @@
             <h2>Settings</h2>
         </div>
     </div>
-    <sca-menutab menu="settings_menu" active="'groups'" user="menu.user"></sca-menutab>
+    <sca-menutab
+        menu="settings_menu"
+        active="'groups'"
+        user="menu.user"
+    ></sca-menutab>
 </div>
-<div class="container" style="margin-top: 130px;">
-    <button type="button" ng-click="edit('new')" class="btn pull-right">New Group</button>
-    <br clear="both">
-    <br>
+<div class="container" style="margin-top: 130px">
+    <button type="button" ng-click="edit('new')" class="btn pull-right">
+        New Group
+    </button>
+    <br clear="both" />
+    <br />
     <ul class="list-group">
         <li class="list-group-item" ng-repeat="group in groups">
             <div class="pull-right edit_button" ng-if="group.canedit">
-                <button type="button" ng-click="edit(group.id)" class="btn btn-xs pull-right"><i class="fa fa-pencil-square-o"></i></button>
+                <button
+                    type="button"
+                    ng-click="edit(group.id)"
+                    class="btn btn-xs pull-right"
+                >
+                    <i class="fa fa-pencil-square-o"></i>
+                </button>
             </div>
             <h4>
-                <small class="text-muted">{{group.id}}</small> {{group.name}} 
-                <span class="label label-danger" ng-if="group.active == false">Inactive</span>
+                <small class="text-muted">{{group.id}}</small> {{group.name}}
+                <span class="label label-danger" ng-if="group.active == false"
+                    >Inactive</span
+                >
                 <p class="help-block">{{group.desc}}</p>
             </h4>
             <!--
@@ -30,7 +44,7 @@
                 <span ng-if="user.password_hash" class="label label-warning">password set</span>
             </p>
             -->
-            
+
             <div class="row">
                 <div class="col-md-4">
                     <h5>Admins</h5>
@@ -46,9 +60,10 @@
                     <small><pre>{{group.Members|json}}</pre></small>
                     -->
                 </div>
-            </div><!--row-->
+            </div>
+            <!--row-->
         </li>
     </ul>
-    <ng-include src="'t/footer.html'"></ng-include> <!--should this be part of view?-->
+    <ng-include src="'t/footer.html'"></ng-include>
+    <!--should this be part of view?-->
 </div>
-
