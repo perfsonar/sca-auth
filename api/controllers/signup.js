@@ -1,17 +1,16 @@
-
 //contrib
-const express = require('express');
+const express = require("express");
 const router = express.Router();
-const winston = require('winston');
-const clone = require('clone');
-const async = require('async');
-const jwt = require('express-jwt');
+const winston = require("winston");
+const clone = require("clone");
+const async = require("async");
+const jwt = require("express-jwt");
 
 //mine
-const config = require('../config');
+const config = require("../config");
 const logger = new winston.Logger(config.logger.winston);
-const db = require('../models');
-const common = require('../common');
+const db = require("../models");
+const common = require("../common");
 
 function registerUser(body, done) {
     var u = clone(config.auth.default);
@@ -20,35 +19,35 @@ function registerUser(body, done) {
     u.email = body.email;
     var user = db.User.build(u);
     //console.dir(user);
-    logger.info("registering new user: "+u.username);
-    user.setPassword(body.password, function(err) {
-        if(err) return done(err);
+    logger.info("registering new user: " + u.username);
+    user.setPassword(body.password, function (err) {
+        if (err) return done(err);
         logger.debug("set password done");
-        user.save().then(function() {
+        user.save().then(function () {
             //add to default groups
-            user.addMemberGroups(u.gids, function() {
-                done(null, user);    
+            user.addMemberGroups(u.gids, function () {
+                done(null, user);
             });
         });
     });
 }
 
 function updateUser(req, done) {
-    db.User.findOne({where: {id: req.user.sub} }).then(function(user) {
-        if(!user) return done("can't find user");
+    db.User.findOne({ where: { id: req.user.sub } }).then(function (user) {
+        if (!user) return done("can't find user");
         //set things if it's not set yet
-        if(!user.username) user.username = req.body.username;
-        if(!user.fullname) user.fullname = req.body.fullname;
-        if(!user.email) user.email = req.body.email;
-        if(!user.password_hash) {
-            user.setPassword(req.body.password, function(err) {
-                if(err) return done(err);
-                user.save().then(()=>{
+        if (!user.username) user.username = req.body.username;
+        if (!user.fullname) user.fullname = req.body.fullname;
+        if (!user.email) user.email = req.body.email;
+        if (!user.password_hash) {
+            user.setPassword(req.body.password, function (err) {
+                if (err) return done(err);
+                user.save().then(() => {
                     done(null, user);
                 });
             });
         } else {
-            user.save().then(()=>{
+            user.save().then(() => {
                 done(null, user);
             });
         }
@@ -67,61 +66,91 @@ function updateUser(req, done) {
  *
  */
 
-router.post('/', jwt({secret: config.auth.public_key, credentialsRequired: false}), function(req, res, next) {
-    var username = req.body.username;
-    var email = req.body.email;
+router.post(
+    "/",
+    jwt({ secret: config.auth.public_key, credentialsRequired: false }),
+    function (req, res, next) {
+        var username = req.body.username;
+        var email = req.body.email;
 
-    function post_process(err, user) {
-        if(err) return next(err);
-        common.createClaim(user, function(err, claim) {
-            if(err) return next(err);
-            var jwt = common.signJwt(claim);
-            if(config.local.email_confirmation && !user.email_confirmed) {
-                common.send_email_confirmation(req.headers.referer||config.local.url, user, function(err) {
-                    if(err) {
-                        if(!req.user) {
-                            //if we fail to send email, we should unregister the user we just created
-                            user.destroy({force: true}).then(function() {
-                                logger.error("removed newly registered record - email failure");
-                                res.status(500).json({message: "Failed to send confirmation email. Please make sure your email address is valid."});
-                            });
-                        } else {
-                            res.status(500).json({message: "Failed to send confirmation email. Please make sure your email address is valid"});
+        function post_process(err, user) {
+            if (err) return next(err);
+            common.createClaim(user, function (err, claim) {
+                if (err) return next(err);
+                var jwt = common.signJwt(claim);
+                if (config.local.email_confirmation && !user.email_confirmed) {
+                    common.send_email_confirmation(
+                        req.headers.referer || config.local.url,
+                        user,
+                        function (err) {
+                            if (err) {
+                                if (!req.user) {
+                                    //if we fail to send email, we should unregister the user we just created
+                                    user.destroy({ force: true }).then(
+                                        function () {
+                                            logger.error(
+                                                "removed newly registered record - email failure"
+                                            );
+                                            res.status(500).json({
+                                                message:
+                                                    "Failed to send confirmation email. Please make sure your email address is valid.",
+                                            });
+                                        }
+                                    );
+                                } else {
+                                    res.status(500).json({
+                                        message:
+                                            "Failed to send confirmation email. Please make sure your email address is valid",
+                                    });
+                                }
+                            } else {
+                                res.json({
+                                    path: "/confirm_email/" + user.id,
+                                    message:
+                                        "Confirmation Email has been sent. Please check your email inbox.",
+                                    jwt: jwt,
+                                });
+                            }
                         }
-                    } else {
-                        res.json({path:'/confirm_email/'+user.id, message: "Confirmation Email has been sent. Please check your email inbox.", jwt: jwt});
-                    }
-                });
-            } else {
-                //no need for email confrmation..
-                res.json({jwt: jwt, sub: user.id});
-            }
-        });
-    }
-
-    //TODO - validate password strength? (req.body.password)
-    //check for username already taken
-    db.User.findOne({where: {username: username} }).then(function(user) {
-        if(user) {
-            //TODO - maybe I should go ahead and forward user to login form?
-            return next('The username you chose is already registered. If it is yours, please try signing in, or register with a different username.');
-        } else {
-            //check for email already taken
-            db.User.findOne({where: {email: email} }).then(function(user) {
-                if(user) {
-                    //TODO - maybe I should go ahead and forward user to login form?
-                    return next('The email address you chose is already registered. If it is yours, please try signing in, or register with a different email address.');
+                    );
                 } else {
-                    if(req.user) {
-                        updateUser(req, post_process);
-                    } else {
-                        registerUser(req.body, post_process);
-                    }
+                    //no need for email confrmation..
+                    res.json({ jwt: jwt, sub: user.id });
                 }
             });
         }
-    });
-})
+
+        //TODO - validate password strength? (req.body.password)
+        //check for username already taken
+        db.User.findOne({ where: { username: username } }).then(function (
+            user
+        ) {
+            if (user) {
+                //TODO - maybe I should go ahead and forward user to login form?
+                return next(
+                    "The username you chose is already registered. If it is yours, please try signing in, or register with a different username."
+                );
+            } else {
+                //check for email already taken
+                db.User.findOne({ where: { email: email } }).then(function (
+                    user
+                ) {
+                    if (user) {
+                        //TODO - maybe I should go ahead and forward user to login form?
+                        return next(
+                            "The email address you chose is already registered. If it is yours, please try signing in, or register with a different email address."
+                        );
+                    } else {
+                        if (req.user) {
+                            updateUser(req, post_process);
+                        } else {
+                            registerUser(req.body, post_process);
+                        }
+                    }
+                });
+            }
+        });
+    }
+);
 
 module.exports = router;
-

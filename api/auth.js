@@ -1,10 +1,8 @@
 #!/usr/bin/node
-'use strict';
+"use strict";
 
-var server = require('./server');
-server.start(function(err) {
-    if(err) throw err;
+var server = require("./server");
+server.start(function (err) {
+    if (err) throw err;
     console.log("service started");
 });
-
-
