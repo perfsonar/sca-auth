@@ -1,5 +1,5 @@
 {
-      "name": "PWA Auth",
-      "configPath": "/etc/perfsonar/psconfig-web",
-      "port": 3000
+    "name": "PWA Auth",
+    "configPath": "/etc/perfsonar/psconfig-web",
+    "port": 3000
 }
