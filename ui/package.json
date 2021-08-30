@@ -1,6 +1,6 @@
 {
     "name": "sca-auth-ui",
-    "version": "4.3.2",
+    "version": "4.4.1",
     "description": "",
     "main": "common.js",
     "scripts": {

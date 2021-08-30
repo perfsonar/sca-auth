@@ -1,6 +1,6 @@
 {
     "name": "sca-auth",
-    "version": "4.3.2",
+    "version": "4.4.1",
     "main": "api/auth.js",
     "scripts": {
         "start": "node api/auth.js",
