@@ -1,7 +1,5 @@
 FROM node:8
 
-MAINTAINER Michael Johnson <mj82@globalnoc.iu.edu>
-
 RUN npm install http-server -g && \
     npm install pm2 -g && \
     pm2 install pm2-logrotate
