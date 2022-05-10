@@ -141,3 +141,4 @@ docker/db
 ## From grigutis (2021-07-30)
 
 **/package-lock.json
+auth.sqlite
