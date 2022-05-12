@@ -142,3 +142,8 @@ docker/db
 
 **/package-lock.json
 auth.sqlite
+
+## Unibuild
+unibuild-log
+unibuild-work/
+unibuild-repo/

@@ -17,11 +17,11 @@ Summary:		perfSONAR nodejs authentication module used by pSConfig Web Admin etc
 License:		ASL 2.0
 Group:			Applications/Communications
 URL:			http://www.perfsonar.net
-Source0:		perfsonar-psconfig-web-admin-auth-%{version}.%{perfsonar_auto_relnum}.tar.gz
-BuildRoot:		%{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
+Source0:		perfsonar-psconfig-web-admin-auth-%{version}.tar.gz
 BuildArch:		x86_64
+BuildRequires:  npm
 Requires:       nodejs
-Requires:		httpd
+Requires:       httpd
 Requires:       mod_ssl
 Requires:       sqlite
 
@@ -36,9 +36,10 @@ The perfSONAR nodejs authentication module is a web-based, database-backed auth 
 /usr/sbin/useradd -g perfsonar -r -s /sbin/nologin -c "perfSONAR User" -d /tmp perfsonar 2> /dev/null || :
 
 %prep
-%setup -q -n perfsonar-psconfig-web-admin-auth-%{version}.%{perfsonar_auto_relnum}
+%setup -q -n perfsonar-psconfig-web-admin-auth-%{version}
 
 %build
+make npm manifest
 
 %install
 rm -rf %{buildroot}
