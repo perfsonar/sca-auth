@@ -37,7 +37,7 @@
         "sequelize-json": "^2.1.2",
         "sqlite3": "^5.0.8",
         "underscore": "^1.13.3",
-        "winston": "^2.4.6",
+        "winston": "^3.7.2",
         "xml2js": "^0.4.23"
     },
     "devDependencies": {
