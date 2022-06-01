@@ -1,7 +1,7 @@
 #!/usr/bin/bash
 VERSION=`cat version`
 echo "preparing sca-auth version $VERSION"
-docker build -t perfsonar/sca-auth:$VERSION --no-cache --force-rm ..
+docker build --network host -t perfsonar/sca-auth:$VERSION --no-cache --force-rm ..
 if [ ! $? -eq 0 ]; then
     echo "failed to build"
     exit
