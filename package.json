@@ -35,7 +35,7 @@
         "request": "^2.81.0",
         "sequelize": "^3.30.4",
         "sequelize-json": "^2.1.2",
-        "sqlite3": "^5.0.8",
+        "sqlite3": "5.0.2",
         "underscore": "^1.8.3",
         "winston": "^2.3.0",
         "xml2js": "^0.4.17"
