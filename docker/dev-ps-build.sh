@@ -1,5 +1,5 @@
 #!/usr/bin/bash
-VERSION=`cat version`
+VERSION=`cat bleeding-version`
 echo "preparing sca-auth version $VERSION"
 docker build --network host -t perfsonar/sca-auth:$VERSION --no-cache --force-rm ..
 if [ ! $? -eq 0 ]; then
