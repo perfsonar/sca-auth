@@ -13,11 +13,11 @@ default:
 
 dist:
 	make manifest
-	mkdir /tmp/$(PACKAGE)-$(VERSION).$(RELEASE)
-	tar ch -T MANIFEST -T MANIFEST-node_modules -T MANIFEST-ui-node_modules | tar x -C /tmp/$(PACKAGE)-$(VERSION).$(RELEASE)
-	tar czf $(PACKAGE)-$(VERSION).$(RELEASE).tar.gz -C /tmp $(PACKAGE)-$(VERSION).$(RELEASE)
-	rm -rf /tmp/$(PACKAGE)-$(VERSION).$(RELEASE)
-	cp $(PACKAGE)-$(VERSION).$(RELEASE).tar.gz ~/rpmbuild/SOURCES/
+	mkdir /tmp/$(PACKAGE)-$(VERSION)
+	tar ch -T MANIFEST -T MANIFEST-node_modules -T MANIFEST-ui-node_modules | tar x -C /tmp/$(PACKAGE)-$(VERSION)
+	tar czf $(PACKAGE)-$(VERSION).tar.gz -C /tmp $(PACKAGE)-$(VERSION)
+	rm -rf /tmp/$(PACKAGE)-$(VERSION)
+	cp $(PACKAGE)-$(VERSION).tar.gz ~/rpmbuild/SOURCES/
 
 manifest:
 	find node_modules -type f > MANIFEST-node_modules
