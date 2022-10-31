@@ -12,14 +12,14 @@ default:
 	@echo No need to build the package. Just run \"make install\"
 
 dist:
-	make manifest
+	make manifest_files
 	mkdir /tmp/$(PACKAGE)-$(VERSION)
 	tar ch -T MANIFEST -T MANIFEST-node_modules -T MANIFEST-ui-node_modules | tar x -C /tmp/$(PACKAGE)-$(VERSION)
 	tar czf $(PACKAGE)-$(VERSION).tar.gz -C /tmp $(PACKAGE)-$(VERSION)
 	rm -rf /tmp/$(PACKAGE)-$(VERSION)
 	cp $(PACKAGE)-$(VERSION).tar.gz ~/rpmbuild/SOURCES/
 
-manifest:
+manifest_files:
 	find node_modules -type f > MANIFEST-node_modules
 	# add UI node modules, ignoring a few large folders. optimize this later
 	find ui/node_modules -type f | grep -v bootswatch/docs | grep -v ace-builds > MANIFEST-ui-node_modules

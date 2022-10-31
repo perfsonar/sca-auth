@@ -45,7 +45,7 @@ The perfSONAR nodejs authentication module is a web-based, database-backed auth 
 %install
 rm -rf %{buildroot}
 
-make ROOTPATH=%{buildroot}/%{install_base} CONFIGPATH=%{buildroot}/%{config_base} npm manifest install
+make ROOTPATH=%{buildroot}/%{install_base} CONFIGPATH=%{buildroot}/%{config_base} npm manifest_files install
 
 rm -rf %{buildroot}/etc/pwa/apache/%{apacheconf}
 
