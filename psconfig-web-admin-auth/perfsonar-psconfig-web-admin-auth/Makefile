@@ -8,7 +8,8 @@ PERFSONAR_AUTO_RELNUM=0.b2.1
 VERSION=${PERFSONAR_AUTO_VERSION}
 RELEASE=${PERFSONAR_AUTO_RELNUM}
 
-default: npm manifest
+default:
+	@echo No need to build the package. Just run \"make install\"
 
 dist:
 	make manifest

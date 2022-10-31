@@ -20,6 +20,8 @@ URL:			http://www.perfsonar.net
 Source0:		perfsonar-psconfig-web-admin-auth-%{version}.tar.gz
 BuildRoot:		%{_tmppath}/%{name}-%{version}-root-%(%{__id_u} -n)
 BuildArch:		x86_64
+BuildRequires:  nodejs
+BuildRequires:  npm
 Requires:       nodejs
 Requires:		httpd
 Requires:       mod_ssl
@@ -43,7 +45,7 @@ The perfSONAR nodejs authentication module is a web-based, database-backed auth 
 %install
 rm -rf %{buildroot}
 
-make ROOTPATH=%{buildroot}/%{install_base} CONFIGPATH=%{buildroot}/%{config_base} install
+make ROOTPATH=%{buildroot}/%{install_base} CONFIGPATH=%{buildroot}/%{config_base} npm manifest install
 
 rm -rf %{buildroot}/etc/pwa/apache/%{apacheconf}
 
