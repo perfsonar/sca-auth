@@ -3,8 +3,8 @@ ROOTPATH=/usr/lib/perfsonar/psconfig-web-admin/auth
 CONFIGPATH=/etc/perfsonar/psconfig-web
 #LIBPATH=/usr/lib/perfsonar/lib
 #GRAPHLIBPATH=/usr/lib/perfsonar/psconfig-web/lib
-PERFSONAR_AUTO_VERSION=4.4.5
-PERFSONAR_AUTO_RELNUM=2
+PERFSONAR_AUTO_VERSION=4.4.6
+PERFSONAR_AUTO_RELNUM=1
 VERSION=${PERFSONAR_AUTO_VERSION}
 RELEASE=${PERFSONAR_AUTO_RELNUM}
 
