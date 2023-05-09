@@ -101,6 +101,10 @@ install -D -m 0644 ui/images/* %{buildroot}/%{install_base}/ui/images/
 install -D -m 0644 ui/*.js.sample %{buildroot}/%{install_base}/ui/
 install -D -m 0644 ui/css/style.* %{buildroot}/%{install_base}/ui/css/
 
+#Fix all python shebangs from external stuff
+grep -rl 'env python' %{buildroot}/%{install_base} | xargs sed -i -E -e 's@^#!/usr/bin/env python$@#!/usr/bin/env python3@'
+grep -rl '/usr/bin/python' %{buildroot}/%{install_base} | xargs sed -i -E -e 's@^#!/usr/bin/python$@#!/usr/bin/env python3@'
+
 rm -f %{buildroot}/etc/pwa/apache/%{apacheconf}
 
 %clean
