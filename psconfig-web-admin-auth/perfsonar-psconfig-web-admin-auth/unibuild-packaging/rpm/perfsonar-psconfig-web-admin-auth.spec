@@ -6,8 +6,8 @@
 %define apache_base /etc/httpd/conf.d
 %define apacheconf pwa-0auth.conf
 
-%define perfsonar_auto_version 5.1.2
-%define perfsonar_auto_relnum 1
+%define perfsonar_auto_version 5.1.3
+%define perfsonar_auto_relnum 0.a1.0
 %define debug_package %{nil}
 
 Name:			perfsonar-psconfig-web-admin-auth
